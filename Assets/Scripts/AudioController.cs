@@ -4,14 +4,12 @@ using UnityEngine;
 
 public class AudioController : MonoBehaviour
 {
-    private AudioClip GameIntro;
-    private AudioClip GhostNormal;
+    public AudioClip GameIntro;
+    public AudioClip GhostNormal;
     
     
     void Start()
     {
-        GameIntro = Resources.Load<AudioClip>("Audio/GameIntro");
-        GhostNormal = Resources.Load<AudioClip>("Audio/GhostNormal");
         StartCoroutine(playMusic());
     }
 
