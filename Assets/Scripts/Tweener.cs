@@ -6,7 +6,7 @@ public class Tweener : MonoBehaviour
 {
     private float duration = 1.0f;
     private Tween activeTween;
-    private AudioClip LickyGuyMove;
+    public AudioClip LickyGuyMove;
     void Start()
     {
         LickyGuyMove = Resources.Load<AudioClip>("Audio/LickyGuyMove");
