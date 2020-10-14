@@ -4,12 +4,15 @@ using UnityEngine;
 
 public class AudioController : MonoBehaviour
 {
-    public AudioClip GameIntro;
+    public AudioClip GhostScared;
     public AudioClip GhostNormal;
+    public AudioClip GhostDead;
+
     
     
     void Start()
     {
+        Debug.Log(gameObject.name);
         StartCoroutine(playMusic());
     }
 
@@ -21,12 +24,10 @@ public class AudioController : MonoBehaviour
 
     IEnumerator playMusic()
     {
-        GetComponent<AudioSource>().clip = GameIntro;
-        GetComponent<AudioSource>().Play();
-        GetComponent<AudioSource>().volume = 0.6f;
-        yield return new WaitForSeconds(GameIntro.length);
+        
         GetComponent<AudioSource>().clip = GhostNormal;
         GetComponent<AudioSource>().Play();
         GetComponent<AudioSource>().loop = true;
+        yield return new WaitForSeconds(0);
     }
 }

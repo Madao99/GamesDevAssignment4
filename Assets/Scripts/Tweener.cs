@@ -4,66 +4,58 @@ using UnityEngine;
 
 public class Tweener : MonoBehaviour
 {
-    private float duration = 1.0f;
-    private Tween activeTween;
-    public AudioClip LickyGuyMove;
+    //private Tween activeTween;
+    private List<Tween> activeTweens;
+
     void Start()
     {
-        LickyGuyMove = Resources.Load<AudioClip>("Audio/LickyGuyMove");
-        //StartCoroutine(Delay());
+        activeTweens = new List<Tween>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if(activeTween != null)
+        //if (activeTween != null)
+        Tween activeTween;
+        for (int i = activeTweens.Count - 1; i >= 0; i--) //Tween activeTween in activeTweens.Reverse<Tween>())
         {
-            gameObject.GetComponent<AudioSource>().clip = LickyGuyMove;
-            gameObject.GetComponent<AudioSource>().Play();
-            gameObject.GetComponent<AudioSource>().volume = 0.7f;
-        }
-        if(gameObject.transform.position.x == 1 && gameObject.transform.position.y == -1)
-        {
-            activeTween = new Tween(gameObject.transform, gameObject.transform.position, new Vector3(6.0f, -1.0f, 0.0f), Time.time, duration);
-            gameObject.transform.rotation = Quaternion.Euler(0, 0, 90);
-        }
-        if (gameObject.transform.position.x == 6 && gameObject.transform.position.y == -1)
-        {
-            activeTween = new Tween(gameObject.transform, gameObject.transform.position, new Vector3(6.0f, -5.0f, 0.0f), Time.time, duration);
-            gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
-        }
-        if (gameObject.transform.position.x == 6 && gameObject.transform.position.y == -5)
-        {
-            activeTween = new Tween(gameObject.transform, gameObject.transform.position, new Vector3(1.0f, -5.0f, 0.0f), Time.time, duration);
-            gameObject.transform.rotation = Quaternion.Euler(0, 0, 270);
-        }
-        if (gameObject.transform.position.x == 1 && gameObject.transform.position.y == -5)
-        {
-            activeTween = new Tween(gameObject.transform, gameObject.transform.position, new Vector3(1.0f, -1.0f, 0.0f), Time.time, duration);
-            gameObject.transform.rotation = Quaternion.Euler(0, 0, 180);
-        }
+            activeTween = activeTweens[i];
 
-        if (Vector3.Distance(activeTween.Target.position, activeTween.EndPos) > 0.1f)
-        {
-            float timeFraction = (Time.time + 0.0000001f - activeTween.StartTime) / activeTween.Duration;
-            activeTween.Target.position = Vector3.Lerp(activeTween.StartPos,
-                                                      activeTween.EndPos,
-                                                       timeFraction);
-        }
-        else
-        {
-            activeTween.Target.position = activeTween.EndPos;
-            activeTween = null;
+            if (Vector3.Distance(activeTween.Target.position, activeTween.EndPos) > 0.1f)
+            {
+                float timeFraction = (Time.time - activeTween.StartTime) / activeTween.Duration;
+                Debug.Log(timeFraction);
+                timeFraction = Mathf.Pow(timeFraction, 3);
+                activeTween.Target.position = Vector3.Lerp(activeTween.StartPos,
+                                                          activeTween.EndPos,
+                                                           timeFraction);
+            }
+            else
+            {
+                activeTween.Target.position = activeTween.EndPos;
+                //activeTween = null;
+                activeTweens.RemoveAt(i);
+            }
         }
     }
 
-    /*private IEnumerator Delay()
+    public bool AddTween(Transform targetObject, Vector3 startPos, Vector3 endPos, float duration)
     {
-        Time.timeScale = 0;
-        while (Time.realtimeSinceStartup < 6.0f)
+        if (!TweenExists(targetObject))
         {
-            yield return 0;
+            activeTweens.Add(new Tween(targetObject, startPos, endPos, Time.time, duration));
+            return true;
         }
-        Time.timeScale = 1;
-    }*/
+        return false;
+    }
+
+
+    public bool TweenExists(Transform target)
+    {
+        foreach (Tween activeTween in activeTweens)
+        {
+            if (activeTween.Target.transform == target)
+                return true;
+        }
+        return false;
+    }
 }
