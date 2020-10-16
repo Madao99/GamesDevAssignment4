@@ -37,9 +37,12 @@ public class PacStudentController : MonoBehaviour
                         { 2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2 },
                         { 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 7, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1 }, };
 
-    private bool movable = false;
     private KeyCode lastInput;
     private KeyCode currentInput;
+    public Animator pacStudentAnim;
+    public ParticleSystem dustEffect;
+    
+
     void Start()
     {
         
@@ -62,12 +65,20 @@ public class PacStudentController : MonoBehaviour
         {
             lastInput = KeyCode.W;
         }
-
+        var emission = dustEffect.emission;
         if (activeTween != null)
         {
             gameObject.GetComponent<AudioSource>().clip = LickyGuyMove;
             gameObject.GetComponent<AudioSource>().Play();
             gameObject.GetComponent<AudioSource>().volume = 0.7f;
+            pacStudentAnim.enabled = true;
+            
+            emission.enabled = true;
+        }
+        else if(activeTween == null)
+        {
+            pacStudentAnim.enabled = false;
+            emission.enabled = false;
         }
         
         if (lastInput == KeyCode.A)
@@ -148,26 +159,8 @@ public class PacStudentController : MonoBehaviour
                 lastInput = currentInput;
             }
         }
-        /*if(gameObject.transform.position.x == 1 && gameObject.transform.position.y == -1)
-        {
-            activeTween = new Tween(gameObject.transform, gameObject.transform.position, new Vector3(6.0f, -1.0f, 0.0f), Time.time, duration);
-            gameObject.transform.rotation = Quaternion.Euler(0, 0, 90);
-        }
-        if (gameObject.transform.position.x == 6 && gameObject.transform.position.y == -1)
-        {
-            activeTween = new Tween(gameObject.transform, gameObject.transform.position, new Vector3(6.0f, -5.0f, 0.0f), Time.time, duration);
-            gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
-        }
-        if (gameObject.transform.position.x == 6 && gameObject.transform.position.y == -5)
-        {
-            activeTween = new Tween(gameObject.transform, gameObject.transform.position, new Vector3(1.0f, -5.0f, 0.0f), Time.time, duration);
-            gameObject.transform.rotation = Quaternion.Euler(0, 0, 270);
-        }
-        if (gameObject.transform.position.x == 1 && gameObject.transform.position.y == -5)
-        {
-            activeTween = new Tween(gameObject.transform, gameObject.transform.position, new Vector3(1.0f, -1.0f, 0.0f), Time.time, duration);
-            gameObject.transform.rotation = Quaternion.Euler(0, 0, 180);
-        }*/
+        
+        
         if (activeTween != null)
         {
             
