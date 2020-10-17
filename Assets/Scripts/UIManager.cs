@@ -3,21 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
     Button quitBtn;
-    
+
+    public TextMeshProUGUI scoreTxt;
+    public static string score;
+
+
+
     void Start()
     {
         DontDestroyOnLoad(gameObject);
-        
     }
 
     
     void Update()
     {
-        
+        scoreTxt.text = score;
     }
 
     public void LoadLevelOne()

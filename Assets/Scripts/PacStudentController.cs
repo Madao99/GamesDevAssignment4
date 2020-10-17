@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class PacStudentController : MonoBehaviour
@@ -7,6 +8,7 @@ public class PacStudentController : MonoBehaviour
     private float duration = 0.4f;
     private Tween activeTween;
     public AudioClip LickyGuyMove;
+    public AudioClip LollyEaten;
     int[,] levelMap = { { 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 7, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1 },
                         { 2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2 },
                         { 2, 5, 3, 4, 4, 3, 5, 3, 4, 4, 4, 3, 5, 4, 4, 5, 3, 4, 4, 4, 3, 5, 3, 4, 4, 3, 5, 2 },
@@ -41,6 +43,7 @@ public class PacStudentController : MonoBehaviour
     private KeyCode currentInput;
     public Animator pacStudentAnim;
     public ParticleSystem dustEffect;
+    private int score;
     
 
     void Start()
@@ -177,9 +180,45 @@ public class PacStudentController : MonoBehaviour
                 activeTween = null;
             }
         }
-        
+        RaycastCheck();
         
     }
 
-    
+    void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log(collision.contacts[0].otherCollider.name);
+        if (collision.contacts[0].otherCollider.tag == "NormalLolly")
+        {
+            Destroy(collision.contacts[0].otherCollider.gameObject);
+            score += 10;
+            UIManager.score = "Score: " + score;
+        }
+    }
+
+    /*void OnTriggerEnter(Collider other)
+    {
+        Debug.Log(other.gameObject.name);
+    }*/
+
+    void RaycastCheck()
+    {
+        RaycastHit hitInfo;
+        Debug.DrawRay(gameObject.transform.position + new Vector3(0.0f, 0.0f, 0.0f), gameObject.transform.TransformDirection(Vector3.forward), Color.green);
+        if (Physics.Raycast(gameObject.transform.position + new Vector3(0.0f, 0.0f, 0f), gameObject.transform.TransformDirection(Vector3.forward), out hitInfo, 3f))
+        {
+            Debug.Log("Raycast Hit: " + hitInfo.collider.gameObject.name);
+            if (hitInfo.collider.gameObject == GameObject.FindGameObjectWithTag("Wall"))
+            {
+            }
+        }
+
+
+
+    }
+    void Raycast()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(gameObject.transform.position, gameObject.transform.TransformDirection(Vector3.forward), 1.0f);
+    }
+
+
 }
