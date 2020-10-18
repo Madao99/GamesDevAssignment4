@@ -9,6 +9,7 @@ public class PacStudentController : MonoBehaviour
     private Tween activeTween;
     public AudioClip LickyGuyMove;
     public AudioClip LollyEaten;
+    public AudioClip collideWall;
     int[,] levelMap = { { 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 7, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1 },
                         { 2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2 },
                         { 2, 5, 3, 4, 4, 3, 5, 3, 4, 4, 4, 3, 5, 4, 4, 5, 3, 4, 4, 4, 3, 5, 3, 4, 4, 3, 5, 2 },
@@ -43,6 +44,8 @@ public class PacStudentController : MonoBehaviour
     private KeyCode currentInput;
     public Animator pacStudentAnim;
     public ParticleSystem dustEffect;
+    public ParticleSystem wallCollision;
+    private ParticleSystem wallEffect;
     private int score;
     
 
@@ -52,30 +55,47 @@ public class PacStudentController : MonoBehaviour
     }
     void Update()
     {
+
+        if (gameObject.transform.position.x >= 26 && gameObject.transform.position.y == -14)
+        {
+            Debug.Log("Yaya");
+            RightTeleport();
+        }
+
+        if (gameObject.transform.position.x <= 2 && gameObject.transform.position.y == -14)
+        {
+            LeftTeleport();
+        }
+
+
+
+
         if (Input.GetKeyDown(KeyCode.A))
         {
             lastInput = KeyCode.A;
         }
+
         if (Input.GetKeyDown(KeyCode.D))
         {
             lastInput = KeyCode.D;
         }
+
         if (Input.GetKeyDown(KeyCode.S))
         {
             lastInput = KeyCode.S;
         }
+
         if (Input.GetKeyDown(KeyCode.W))
         {
             lastInput = KeyCode.W;
         }
+
         var emission = dustEffect.emission;
         if (activeTween != null)
         {
             gameObject.GetComponent<AudioSource>().clip = LickyGuyMove;
             gameObject.GetComponent<AudioSource>().Play();
-            gameObject.GetComponent<AudioSource>().volume = 0.7f;
             pacStudentAnim.enabled = true;
-            
             emission.enabled = true;
         }
         else if(activeTween == null)
@@ -180,8 +200,18 @@ public class PacStudentController : MonoBehaviour
                 activeTween = null;
             }
         }
-        RaycastCheck();
+        //RaycastCheck();
         
+    }
+
+    void LeftTeleport()
+    {
+        gameObject.transform.Translate(0, 24, 0, Space.Self);
+    }
+
+    void RightTeleport()
+    {
+        gameObject.transform.Translate(0, 24, 0, Space.Self);
     }
 
     void OnCollisionEnter(Collision collision)
@@ -193,32 +223,39 @@ public class PacStudentController : MonoBehaviour
             score += 10;
             UIManager.score = "Score: " + score;
         }
+        if (collision.contacts[0].otherCollider.tag == "Wall")
+        {
+            wallEffect = Instantiate(wallCollision, collision.contacts[0].otherCollider.transform);
+            wallEffect.Play();
+            gameObject.GetComponent<AudioSource>().clip = collideWall;
+            StartCoroutine(playWallCollision());
+            
+        }
     }
 
-    /*void OnTriggerEnter(Collider other)
+    IEnumerator playWallCollision()
     {
-        Debug.Log(other.gameObject.name);
-    }*/
+        yield return new WaitForSeconds(0.5f);
+        Destroy(wallEffect);
+    }
 
-    void RaycastCheck()
+    /*void RaycastCheck()
     {
         RaycastHit hitInfo;
         Debug.DrawRay(gameObject.transform.position + new Vector3(0.0f, 0.0f, 0.0f), gameObject.transform.TransformDirection(Vector3.forward), Color.green);
-        if (Physics.Raycast(gameObject.transform.position + new Vector3(0.0f, 0.0f, 0f), gameObject.transform.TransformDirection(Vector3.forward), out hitInfo, 3f))
+        if (Physics.Raycast(gameObject.transform.position + new Vector3(0.0f, 0.0f, 0f), gameObject.transform.TransformDirection(Vector3.down), out hitInfo, 1f))
         {
             Debug.Log("Raycast Hit: " + hitInfo.collider.gameObject.name);
             if (hitInfo.collider.gameObject == GameObject.FindGameObjectWithTag("Wall"))
             {
+                OnCollisionEnter(hitInfo.);
             }
         }
 
 
 
-    }
-    void Raycast()
-    {
-        RaycastHit2D hit = Physics2D.Raycast(gameObject.transform.position, gameObject.transform.TransformDirection(Vector3.forward), 1.0f);
-    }
+    }*/
+
 
 
 }

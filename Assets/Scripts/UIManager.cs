@@ -22,7 +22,8 @@ public class UIManager : MonoBehaviour
     
     void Update()
     {
-        scoreTxt.text = score;
+        if(scoreTxt != null)
+            scoreTxt.text = score;
     }
 
     public void LoadLevelOne()

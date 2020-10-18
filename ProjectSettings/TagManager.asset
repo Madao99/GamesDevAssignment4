@@ -9,6 +9,7 @@ TagManager:
   - QuitBtn
   - Wall
   - NormalLolly
+  - LeftTeleport
   layers:
   - Default
   - TransparentFX
