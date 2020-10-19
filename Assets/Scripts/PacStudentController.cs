@@ -48,10 +48,12 @@ public class PacStudentController : MonoBehaviour
     public ParticleSystem wallCollision;
     private ParticleSystem wallEffect;
     private int score;
+    private int scaredHash = Animator.StringToHash("GhostScared");
     private CherryController cherryControl;
     private Transform rightTeleport;
     private Transform leftTeleport;
     public GameObject pacStudent;
+    public UIManager gameUI;
     
 
     void Start()
@@ -207,7 +209,17 @@ public class PacStudentController : MonoBehaviour
             }
         }
         //RaycastCheck();
-        
+        if(Mathf.Round(gameUI.ghostTimer) <= 3.0f)
+        {
+            Ghost1Anim.SetTrigger("Recovering");
+        }
+        if (Mathf.Round(gameUI.ghostTimer) == 0)
+        {
+            Ghost1Anim.SetTrigger("Normal");
+            gameUI.ghostTimer = 10f;
+            GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().clip = GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioController>().GhostNormal;
+            GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().Play();
+        }
     }
 
 
@@ -250,7 +262,11 @@ public class PacStudentController : MonoBehaviour
 
     void PowerPelletEaten()
     {
-        //Ghost1Anim.SetTrigger("Scared");
+        Ghost1Anim.SetTrigger("Scared");
+        GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().clip = GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioController>().GhostScared;
+        GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().Play();
+        GameObject.Find("GhostTimerTxt").GetComponent<TextMeshProUGUI>().enabled = true;
+        
     }
     /*void RaycastCheck()
     {

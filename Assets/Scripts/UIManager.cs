@@ -10,13 +10,17 @@ public class UIManager : MonoBehaviour
     Button quitBtn;
 
     public TextMeshProUGUI scoreTxt;
+    public TextMeshProUGUI ghostTimerTxt;
     public static string score;
+    public float ghostTimer;
 
 
 
     void Start()
     {
         DontDestroyOnLoad(gameObject);
+        ghostTimerTxt.GetComponent<TextMeshProUGUI>().enabled = false;
+        ghostTimer = 10f;
     }
 
     
@@ -24,6 +28,22 @@ public class UIManager : MonoBehaviour
     {
         if(scoreTxt != null)
             scoreTxt.text = score;
+
+        if(ghostTimerTxt.GetComponent<TextMeshProUGUI>().enabled == true)
+        {           
+            ghostTimer -= Time.deltaTime;
+            ghostTimerTxt.text = "Ghost Timer: " + Mathf.Round(ghostTimer).ToString();
+            if(Mathf.Round(ghostTimer) == 0)
+            {
+                ghostTimerTxt.GetComponent<TextMeshProUGUI>().enabled = false;
+                
+            }
+        }
+    }
+
+    public float GetGhostTimer()
+    {
+        return ghostTimer;
     }
 
     public void LoadLevelOne()

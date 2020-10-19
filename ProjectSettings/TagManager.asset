@@ -14,6 +14,7 @@ TagManager:
   - Ghost
   - RightTeleport
   - Power
+  - MainAudio
   layers:
   - Default
   - TransparentFX

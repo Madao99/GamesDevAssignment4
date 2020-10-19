@@ -124,10 +124,13 @@ MonoBehaviour:
   LollyEaten: {fileID: 8300000, guid: 80cc93d234954c64fb74c4e8185a67a0, type: 3}
   collideWall: {fileID: 8300000, guid: b3a60c15629e23f4e9683f2f248df7ca, type: 3}
   pacStudentAnim: {fileID: 3041457537372481738}
+  Ghost1Anim: {fileID: 5732010801274304956, guid: 989dd593d2ca0b145807b8f9e2c946e5,
+    type: 3}
   dustEffect: {fileID: 3041457537372481751}
   wallCollision: {fileID: 4903782306884806884, guid: e2598e4da1eaab8469a1f4dd66c012ee,
     type: 3}
   pacStudent: {fileID: 3041457537372481746}
+  gameUI: {fileID: 2197708233124996845, guid: 9d112d4e56cf7c3428748b49d5a558a6, type: 3}
 --- !u!114 &3041457537372481737
 MonoBehaviour:
   m_ObjectHideFlags: 0

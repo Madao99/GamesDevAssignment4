@@ -12,7 +12,6 @@ public class AudioController : MonoBehaviour
     
     void Start()
     {
-        Debug.Log(gameObject.name);
         StartCoroutine(playMusic());
     }
 
@@ -30,4 +29,6 @@ public class AudioController : MonoBehaviour
         GetComponent<AudioSource>().loop = true;
         yield return new WaitForSeconds(0);
     }
+
+
 }
