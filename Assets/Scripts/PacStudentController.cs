@@ -43,28 +43,34 @@ public class PacStudentController : MonoBehaviour
     private KeyCode lastInput;
     private KeyCode currentInput;
     public Animator pacStudentAnim;
+    public Animator Ghost1Anim;
     public ParticleSystem dustEffect;
     public ParticleSystem wallCollision;
     private ParticleSystem wallEffect;
     private int score;
+    private CherryController cherryControl;
+    private Transform rightTeleport;
+    private Transform leftTeleport;
+    public GameObject pacStudent;
     
 
     void Start()
     {
-        
+        cherryControl = GameObject.Find("MapLoader").GetComponent<CherryController>();
+        rightTeleport = GameObject.Find("RightTeleport").GetComponent<Transform>();
+        leftTeleport = GameObject.Find("LeftTeleport").GetComponent<Transform>();
     }
     void Update()
     {
 
-        if (gameObject.transform.position.x >= 26 && gameObject.transform.position.y == -14)
+        if (gameObject.transform.position.x >= 27 && gameObject.transform.position.y == -14)
         {
-            Debug.Log("Yaya");
-            RightTeleport();
+            gameObject.transform.position = leftTeleport.position;
         }
 
-        if (gameObject.transform.position.x <= 2 && gameObject.transform.position.y == -14)
+        if (gameObject.transform.position.x <= 1 && gameObject.transform.position.y == -14)
         {
-            LeftTeleport();
+            gameObject.transform.position = rightTeleport.position;
         }
 
 
@@ -204,19 +210,10 @@ public class PacStudentController : MonoBehaviour
         
     }
 
-    void LeftTeleport()
-    {
-        gameObject.transform.Translate(0, 24, 0, Space.Self);
-    }
 
-    void RightTeleport()
-    {
-        gameObject.transform.Translate(0, 24, 0, Space.Self);
-    }
 
     void OnCollisionEnter(Collision collision)
     {
-        Debug.Log(collision.contacts[0].otherCollider.name);
         if (collision.contacts[0].otherCollider.tag == "NormalLolly")
         {
             Destroy(collision.contacts[0].otherCollider.gameObject);
@@ -231,6 +228,18 @@ public class PacStudentController : MonoBehaviour
             StartCoroutine(playWallCollision());
             
         }
+        if (collision.contacts[0].otherCollider.tag == "Bonus")
+        {
+            Destroy(collision.contacts[0].otherCollider.gameObject);
+            StartCoroutine(cherryControl.CherryRespawn());
+            score += 100;
+            UIManager.score = "Score: " + score;
+        }
+        if (collision.contacts[0].otherCollider.tag == "Power")
+        {
+            Destroy(collision.contacts[0].otherCollider.gameObject);
+            PowerPelletEaten();
+        }
     }
 
     IEnumerator playWallCollision()
@@ -239,6 +248,10 @@ public class PacStudentController : MonoBehaviour
         Destroy(wallEffect);
     }
 
+    void PowerPelletEaten()
+    {
+        //Ghost1Anim.SetTrigger("Scared");
+    }
     /*void RaycastCheck()
     {
         RaycastHit hitInfo;

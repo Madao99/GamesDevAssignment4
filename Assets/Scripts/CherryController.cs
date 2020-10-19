@@ -48,7 +48,7 @@ public class CherryController : MonoBehaviour
         }
     }
 
-    IEnumerator CherryRespawn()
+    public IEnumerator CherryRespawn()
     {
         yield return new WaitForSecondsRealtime(30.0f);
         instantiated = false;

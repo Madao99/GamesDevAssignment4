@@ -35,12 +35,12 @@ AnimatorController:
   m_Name: GhostAnimator_1
   serializedVersion: 5
   m_AnimatorParameters:
-  - m_Name: New Trigger
+  - m_Name: Scared
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 1
-    m_Controller: {fileID: 9100000}
+    m_Controller: {fileID: 0}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
