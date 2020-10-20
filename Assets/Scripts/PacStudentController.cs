@@ -10,6 +10,7 @@ public class PacStudentController : MonoBehaviour
     public AudioClip LickyGuyMove;
     public AudioClip LollyEaten;
     public AudioClip collideWall;
+
     int[,] levelMap = { { 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 7, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1 },
                         { 2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2 },
                         { 2, 5, 3, 4, 4, 3, 5, 3, 4, 4, 4, 3, 5, 4, 4, 5, 3, 4, 4, 4, 3, 5, 3, 4, 4, 3, 5, 2 },
@@ -42,25 +43,41 @@ public class PacStudentController : MonoBehaviour
 
     private KeyCode lastInput;
     private KeyCode currentInput;
+
     public Animator pacStudentAnim;
     public Animator Ghost1Anim;
+    public Animator Ghost2Anim;
+    public Animator Ghost3Anim;
+    public Animator Ghost4Anim;
+
     public ParticleSystem dustEffect;
     public ParticleSystem wallCollision;
+    public ParticleSystem deathEffect;
     private ParticleSystem wallEffect;
+    private ParticleSystem deathPlay;
+
     private int score;
-    private int scaredHash = Animator.StringToHash("GhostScared");
     private CherryController cherryControl;
+
     private Transform rightTeleport;
     private Transform leftTeleport;
+    public Transform startPos;
+
     public GameObject pacStudent;
     public UIManager gameUI;
-    
+
+    private bool ghost1Dead = false;
+    private bool ghost2Dead = false;
+    private bool ghost3Dead = false;
+    private bool ghost4Dead = false;
 
     void Start()
     {
         cherryControl = GameObject.Find("MapLoader").GetComponent<CherryController>();
         rightTeleport = GameObject.Find("RightTeleport").GetComponent<Transform>();
         leftTeleport = GameObject.Find("LeftTeleport").GetComponent<Transform>();
+        startPos = GameObject.Find("StartPos").GetComponent<Transform>();
+        //gameUI = GameObject.Find("UIManager").GetComponent<UIManager>();
     }
     void Update()
     {
@@ -208,21 +225,70 @@ public class PacStudentController : MonoBehaviour
                 activeTween = null;
             }
         }
-        //RaycastCheck();
-        if(Mathf.Round(gameUI.ghostTimer) <= 3.0f)
-        {
-            Ghost1Anim.SetTrigger("Recovering");
-        }
-        if (Mathf.Round(gameUI.ghostTimer) == 0)
-        {
-            Ghost1Anim.SetTrigger("Normal");
-            gameUI.ghostTimer = 10f;
-            GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().clip = GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioController>().GhostNormal;
-            GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().Play();
-        }
+        AnimateGhosts();
+        
     }
 
+    void AnimateGhosts()
+    {
 
+        if (Mathf.Round(gameUI.ghostTimer) <= 3)
+        {
+            if (!Ghost1Anim.GetCurrentAnimatorStateInfo(0).IsName("GhostDead") && ghost1Dead == false)
+            {
+                Ghost1Anim.SetTrigger("Recovering");
+                Ghost1Anim.ResetTrigger("Scared");
+            }
+
+            if (!Ghost2Anim.GetCurrentAnimatorStateInfo(0).IsName("GhostDead") && ghost2Dead == false)
+            {
+                Ghost2Anim.SetTrigger("Recovering");
+                Ghost2Anim.ResetTrigger("Scared");
+            }
+
+            if (!Ghost3Anim.GetCurrentAnimatorStateInfo(0).IsName("GhostDead") && ghost3Dead == false)
+            {
+                Ghost3Anim.SetTrigger("Recovering");
+                Ghost3Anim.ResetTrigger("Scared");
+            }
+
+            if (!Ghost4Anim.GetCurrentAnimatorStateInfo(0).IsName("GhostDead") && ghost4Dead == false)
+            {
+                Ghost4Anim.SetTrigger("Recovering");
+                Ghost4Anim.ResetTrigger("Scared");
+            }
+        }
+    
+        if (Mathf.Round(gameUI.ghostTimer) == 0)
+        {
+            if (Ghost1Anim.GetCurrentAnimatorStateInfo(0).IsName("GhostDead") == false)
+            {
+                Ghost1Anim.SetTrigger("Normal");
+                Ghost1Anim.ResetTrigger("Recovering");
+            }
+            if (!Ghost2Anim.GetCurrentAnimatorStateInfo(0).IsName("GhostDead"))
+            {
+                Ghost2Anim.SetTrigger("Normal");
+                Ghost2Anim.ResetTrigger("Recovering");
+            }
+            if (!Ghost3Anim.GetCurrentAnimatorStateInfo(0).IsName("GhostDead"))
+            {
+                Ghost3Anim.SetTrigger("Normal");
+                Ghost3Anim.ResetTrigger("Recovering");
+            }
+            if (!Ghost4Anim.GetCurrentAnimatorStateInfo(0).IsName("GhostDead"))
+            {
+                Ghost4Anim.SetTrigger("Normal");
+                Ghost4Anim.ResetTrigger("Recovering");
+            }
+            gameUI.ghostTimer = 10f;
+            if (ghost1Dead == false && ghost2Dead == false && ghost3Dead == false && ghost4Dead == false)
+            {
+                GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().clip = GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioController>().GhostNormal;
+                GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().Play();
+            }
+        }
+    }
 
     void OnCollisionEnter(Collision collision)
     {
@@ -252,6 +318,83 @@ public class PacStudentController : MonoBehaviour
             Destroy(collision.contacts[0].otherCollider.gameObject);
             PowerPelletEaten();
         }
+        if (collision.contacts[0].otherCollider.tag == "Ghost")
+        {
+            
+            StartCoroutine(GhostCollision(collision.contacts[0].otherCollider.gameObject));
+        }
+    }
+
+    IEnumerator GhostCollision(GameObject ghost)
+    {
+        if (ghost.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("GhostAnimator"))
+        {
+            UIManager.lifeNumber--;
+            lastInput = KeyCode.Space;
+            activeTween = null;
+            deathPlay = Instantiate(deathEffect, gameObject.transform);
+            deathPlay.Play();
+            yield return new WaitForSeconds(2.0f);
+            gameObject.transform.position = startPos.position;
+            gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
+            Destroy(deathPlay);
+        }
+        if (ghost.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("GhostScared") ||
+            ghost.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("GhostRecover"))
+        {
+            ghost.GetComponent<Animator>().SetTrigger("Dead");
+            ghost.GetComponent<Animator>().ResetTrigger("Scared");
+            ghost.GetComponent<Animator>().ResetTrigger("Recovering");
+            if (ghost.name == "Ghost1")
+            {
+                ghost1Dead = true;
+                Debug.Log(ghost1Dead);
+            }
+            if (ghost.name == "Ghost2")
+            {
+                ghost2Dead = true;
+                Debug.Log(ghost2Dead);
+            }
+            if (ghost.name == "Ghost3")
+            {
+                ghost3Dead = true;
+                Debug.Log(ghost3Dead);
+            }
+            if (ghost.name == "Ghost4")
+            {
+                ghost4Dead = true;
+                Debug.Log(ghost4Dead);
+            }
+            score += 300;
+            UIManager.score = "Score: " + score;
+            GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().clip = GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioController>().GhostDead;
+            GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().Play();
+            //set to the remainder of the ghost timer as otherwise when finished it goes back to scared/recovering state as timer hasnt finished
+            yield return new WaitForSeconds(5.0f);
+            if (ghost.name == "Ghost1")
+            {
+                ghost1Dead = false;
+            }
+            if (ghost.name == "Ghost2")
+            {
+                ghost2Dead = false;
+            }
+            if (ghost.name == "Ghost3")
+            {
+                ghost3Dead = false;
+            }
+            if (ghost.name == "Ghost4")
+            {
+                ghost4Dead = false;
+            }
+            if (ghost1Dead == false && ghost2Dead == false && ghost3Dead == false && ghost4Dead == false)
+            {
+                GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().clip = GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioController>().GhostNormal;
+                GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().Play();
+            }
+            ghost.GetComponent<Animator>().SetTrigger("Normal");
+
+        }
     }
 
     IEnumerator playWallCollision()
@@ -263,6 +406,13 @@ public class PacStudentController : MonoBehaviour
     void PowerPelletEaten()
     {
         Ghost1Anim.SetTrigger("Scared");
+        Ghost2Anim.SetTrigger("Scared");
+        Ghost3Anim.SetTrigger("Scared");
+        Ghost4Anim.SetTrigger("Scared");
+        Ghost1Anim.ResetTrigger("Normal");
+        Ghost2Anim.ResetTrigger("Normal");
+        Ghost3Anim.ResetTrigger("Normal");
+        Ghost4Anim.ResetTrigger("Normal");
         GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().clip = GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioController>().GhostScared;
         GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().Play();
         GameObject.Find("GhostTimerTxt").GetComponent<TextMeshProUGUI>().enabled = true;
