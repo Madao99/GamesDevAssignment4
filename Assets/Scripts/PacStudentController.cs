@@ -77,7 +77,7 @@ public class PacStudentController : MonoBehaviour
         rightTeleport = GameObject.Find("RightTeleport").GetComponent<Transform>();
         leftTeleport = GameObject.Find("LeftTeleport").GetComponent<Transform>();
         startPos = GameObject.Find("StartPos").GetComponent<Transform>();
-        //gameUI = GameObject.Find("UIManager").GetComponent<UIManager>();
+        gameUI = GameObject.Find("MapLoader").GetComponent<UIManager>();
     }
     void Update()
     {
@@ -294,15 +294,19 @@ public class PacStudentController : MonoBehaviour
     {
         if (collision.contacts[0].otherCollider.tag == "NormalLolly")
         {
+            gameObject.GetComponent<AudioSource>().clip = LollyEaten;
+            gameObject.GetComponent<AudioSource>().Play();
             Destroy(collision.contacts[0].otherCollider.gameObject);
             score += 10;
-            UIManager.score = "Score: " + score;
+            UIManager.score = score;
+            gameUI.SetLollyCount(gameUI.GetLollyCount() - 1);
         }
         if (collision.contacts[0].otherCollider.tag == "Wall")
         {
             wallEffect = Instantiate(wallCollision, collision.contacts[0].otherCollider.transform);
             wallEffect.Play();
             gameObject.GetComponent<AudioSource>().clip = collideWall;
+            gameObject.GetComponent<AudioSource>().Play();
             StartCoroutine(playWallCollision());
             
         }
@@ -311,7 +315,7 @@ public class PacStudentController : MonoBehaviour
             Destroy(collision.contacts[0].otherCollider.gameObject);
             StartCoroutine(cherryControl.CherryRespawn());
             score += 100;
-            UIManager.score = "Score: " + score;
+            UIManager.score = score;
         }
         if (collision.contacts[0].otherCollider.tag == "Power")
         {
@@ -366,7 +370,7 @@ public class PacStudentController : MonoBehaviour
                 Debug.Log(ghost4Dead);
             }
             score += 300;
-            UIManager.score = "Score: " + score;
+            UIManager.score = score;
             GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().clip = GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioController>().GhostDead;
             GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().Play();
             //set to the remainder of the ghost timer as otherwise when finished it goes back to scared/recovering state as timer hasnt finished

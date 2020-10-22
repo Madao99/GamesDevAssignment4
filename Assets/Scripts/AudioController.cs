@@ -7,18 +7,25 @@ public class AudioController : MonoBehaviour
     public AudioClip GhostScared;
     public AudioClip GhostNormal;
     public AudioClip GhostDead;
-
+    private UIManager gameUI;
+    private bool isPlaying;
     
     
     void Start()
     {
-        StartCoroutine(playMusic());
+        gameUI = GameObject.Find("MapLoader").GetComponent<UIManager>();
+        isPlaying = false;
+        
     }
 
     
     void Update()
     {
-        
+        if (gameUI.countdownTxt.text == "GO!!" && isPlaying == false)
+        {
+            isPlaying = true;
+            StartCoroutine(playMusic());
+        }
     }
 
     IEnumerator playMusic()
@@ -27,6 +34,7 @@ public class AudioController : MonoBehaviour
         GetComponent<AudioSource>().clip = GhostNormal;
         GetComponent<AudioSource>().Play();
         GetComponent<AudioSource>().loop = true;
+        GetComponent<AudioSource>().volume = 0.5f;
         yield return new WaitForSeconds(0);
     }
 

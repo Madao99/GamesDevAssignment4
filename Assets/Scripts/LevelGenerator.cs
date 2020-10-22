@@ -5,6 +5,7 @@ using UnityEngine;
 public class LevelGenerator : MonoBehaviour
 {
     [SerializeField] private GameObject[] mapPieces = new GameObject[7];
+    private List<GameObject> lollies = new List<GameObject>();
     private GameObject outsideCorners;
     private int xPositionCount = 0;
     private int xPositionTopRight = 27;
@@ -23,7 +24,7 @@ public class LevelGenerator : MonoBehaviour
                         { 2, 5, 5, 5, 5, 5, 5, 4, 4, 5, 5, 5, 5, 4 },
                         { 1, 2, 2, 2, 2, 1, 5, 4, 3, 4, 4, 3, 0, 4 },
                         { 0, 0, 0, 0, 0, 2, 5, 4, 3, 4, 4, 3, 0, 3 },
-                        { 0, 0, 0, 0, 0, 2, 5, 4, 4, 0, 0, 0, 0, 6 },
+                        { 0, 0, 0, 0, 0, 2, 5, 4, 4, 0, 0, 0, 0, 0 },
                         { 0, 0, 0, 0, 0, 2, 5, 4, 4, 0, 3, 4, 4, 0 },
                         { 2, 2, 2, 2, 2, 1, 5, 3, 3, 0, 4, 0, 0, 0 },
                         { 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 4, 0, 0, 0 }, };
@@ -103,9 +104,11 @@ public class LevelGenerator : MonoBehaviour
 
                 if (levelMap[i, j] == 5)
                 {
-                    Instantiate(mapPieces[4], new Vector2(xPositionCount, yPositionCount), rotations[i, j], normalLollies.transform);
+                    GameObject topLeft = Instantiate(mapPieces[4], new Vector2(xPositionCount, yPositionCount), rotations[i, j], normalLollies.transform);
+                    lollies.Add(topLeft);
                     GameObject topRight = Instantiate(mapPieces[4], new Vector2(xPositionTopRight, yPositionCount), rotations[i, j], normalLollies.transform);
                     topRight.transform.localScale = new Vector2(-topRight.transform.localScale.x, topRight.transform.localScale.y);
+                    lollies.Add(topRight);
                 }
 
                 if (levelMap[i, j] == 6)
@@ -194,9 +197,11 @@ public class LevelGenerator : MonoBehaviour
 
                 if (levelMap[i, j] == 5)
                 {
-                    Instantiate(mapPieces[4], new Vector2(xPositionCount, yPositionBottom), rotations[i, j], normalLollies.transform);
+                    GameObject bottomleft = Instantiate(mapPieces[4], new Vector2(xPositionCount, yPositionBottom), rotations[i, j], normalLollies.transform);
+                    lollies.Add(bottomleft);
                     GameObject bottomRight = Instantiate(mapPieces[4], new Vector2(xPositionBottomRight, yPositionBottom), rotations[i, j], normalLollies.transform);
                     bottomRight.transform.localScale = new Vector2(-bottomRight.transform.localScale.x, bottomRight.transform.localScale.y);
+                    lollies.Add(bottomRight);
                 }
 
                 if (levelMap[i, j] == 6)
@@ -218,6 +223,11 @@ public class LevelGenerator : MonoBehaviour
             }
             yPositionBottom++;
         }
+    }
+
+    public int GetLollies()
+    {
+        return lollies.Count;
     }
 
 }
