@@ -61,6 +61,7 @@ public class UIManager : MonoBehaviour
     {
         if (started == false && GameObject.FindGameObjectWithTag("Player") != null) 
         {
+            gameOverTxt.text = "";
             StartCoroutine(LevelCountdown());
             started = true;
         }
@@ -68,7 +69,7 @@ public class UIManager : MonoBehaviour
         if (sceneLoaded == true)
         {
             GameObject.FindGameObjectWithTag("QuitBtn").GetComponent<Button>().onClick.AddListener(LoadStartScene);
-            gameOverTxt.text = "";
+            
             lifeNumber = 3;
             sceneLoaded = false;
         }
