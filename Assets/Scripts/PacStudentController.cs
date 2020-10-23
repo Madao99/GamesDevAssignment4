@@ -10,6 +10,7 @@ public class PacStudentController : MonoBehaviour
     public AudioClip LickyGuyMove;
     public AudioClip LollyEaten;
     public AudioClip collideWall;
+    private bool eating;
 
     int[,] levelMap = { { 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 7, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1 },
                         { 2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2 },
@@ -70,6 +71,7 @@ public class PacStudentController : MonoBehaviour
     private bool ghost2Dead = false;
     private bool ghost3Dead = false;
     private bool ghost4Dead = false;
+    private bool scared = false;
 
     void Start()
     {
@@ -118,8 +120,11 @@ public class PacStudentController : MonoBehaviour
         var emission = dustEffect.emission;
         if (activeTween != null)
         {
-            gameObject.GetComponent<AudioSource>().clip = LickyGuyMove;
-            gameObject.GetComponent<AudioSource>().Play();
+            if (eating == false)
+            {
+                GameObject.FindGameObjectWithTag("PacSound").GetComponent<AudioSource>().clip = GameObject.FindGameObjectWithTag("PacSound").GetComponent<PacAudioController>().LickyGuyMove;
+                GameObject.FindGameObjectWithTag("PacSound").GetComponent<AudioSource>().Play();
+            }
             pacStudentAnim.enabled = true;
             emission.enabled = true;
         }
@@ -294,8 +299,7 @@ public class PacStudentController : MonoBehaviour
     {
         if (collision.contacts[0].otherCollider.tag == "NormalLolly")
         {
-            gameObject.GetComponent<AudioSource>().clip = LollyEaten;
-            gameObject.GetComponent<AudioSource>().Play();
+            StartCoroutine(PlayPelletEatenAudio());
             Destroy(collision.contacts[0].otherCollider.gameObject);
             score += 10;
             UIManager.score = score;
@@ -320,13 +324,22 @@ public class PacStudentController : MonoBehaviour
         if (collision.contacts[0].otherCollider.tag == "Power")
         {
             Destroy(collision.contacts[0].otherCollider.gameObject);
-            PowerPelletEaten();
+            StartCoroutine(PowerPelletEaten());
         }
         if (collision.contacts[0].otherCollider.tag == "Ghost")
         {
             
             StartCoroutine(GhostCollision(collision.contacts[0].otherCollider.gameObject));
         }
+    }
+
+    IEnumerator PlayPelletEatenAudio()
+    {
+        eating = true;
+        GameObject.FindGameObjectWithTag("PacSound").GetComponent<AudioSource>().clip = GameObject.FindGameObjectWithTag("PacSound").GetComponent<PacAudioController>().LollyEaten;
+        GameObject.FindGameObjectWithTag("PacSound").GetComponent<AudioSource>().Play();
+        yield return new WaitForSeconds(GameObject.FindGameObjectWithTag("PacSound").GetComponent<PacAudioController>().LollyEaten.length);
+        eating = false;
     }
 
     IEnumerator GhostCollision(GameObject ghost)
@@ -373,7 +386,6 @@ public class PacStudentController : MonoBehaviour
             UIManager.score = score;
             GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().clip = GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioController>().GhostDead;
             GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().Play();
-            //set to the remainder of the ghost timer as otherwise when finished it goes back to scared/recovering state as timer hasnt finished
             yield return new WaitForSeconds(5.0f);
             if (ghost.name == "Ghost1")
             {
@@ -393,9 +405,18 @@ public class PacStudentController : MonoBehaviour
             }
             if (ghost1Dead == false && ghost2Dead == false && ghost3Dead == false && ghost4Dead == false)
             {
-                GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().clip = GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioController>().GhostNormal;
-                GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().Play();
+                if (scared == false)
+                {
+                    GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().clip = GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioController>().GhostNormal;
+                    GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().Play();
+                }
+                else
+                {
+                    GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().clip = GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioController>().GhostScared;
+                    GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().Play();
+                }
             }
+            
             ghost.GetComponent<Animator>().SetTrigger("Normal");
 
         }
@@ -407,8 +428,9 @@ public class PacStudentController : MonoBehaviour
         Destroy(wallEffect);
     }
 
-    void PowerPelletEaten()
+    IEnumerator PowerPelletEaten()
     {
+        scared = true;
         Ghost1Anim.SetTrigger("Scared");
         Ghost2Anim.SetTrigger("Scared");
         Ghost3Anim.SetTrigger("Scared");
@@ -420,25 +442,7 @@ public class PacStudentController : MonoBehaviour
         GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().clip = GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioController>().GhostScared;
         GameObject.FindGameObjectWithTag("MainAudio").GetComponent<AudioSource>().Play();
         GameObject.Find("GhostTimerTxt").GetComponent<TextMeshProUGUI>().enabled = true;
-        
+        yield return new WaitForSeconds(10f);
+        scared = false;
     }
-    /*void RaycastCheck()
-    {
-        RaycastHit hitInfo;
-        Debug.DrawRay(gameObject.transform.position + new Vector3(0.0f, 0.0f, 0.0f), gameObject.transform.TransformDirection(Vector3.forward), Color.green);
-        if (Physics.Raycast(gameObject.transform.position + new Vector3(0.0f, 0.0f, 0f), gameObject.transform.TransformDirection(Vector3.down), out hitInfo, 1f))
-        {
-            Debug.Log("Raycast Hit: " + hitInfo.collider.gameObject.name);
-            if (hitInfo.collider.gameObject == GameObject.FindGameObjectWithTag("Wall"))
-            {
-                OnCollisionEnter(hitInfo.);
-            }
-        }
-
-
-
-    }*/
-
-
-
 }

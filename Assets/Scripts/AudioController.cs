@@ -34,7 +34,7 @@ public class AudioController : MonoBehaviour
         GetComponent<AudioSource>().clip = GhostNormal;
         GetComponent<AudioSource>().Play();
         GetComponent<AudioSource>().loop = true;
-        GetComponent<AudioSource>().volume = 0.5f;
+        GetComponent<AudioSource>().volume = 0.35f;
         yield return new WaitForSeconds(0);
     }
 

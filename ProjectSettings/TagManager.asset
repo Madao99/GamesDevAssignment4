@@ -15,6 +15,7 @@ TagManager:
   - RightTeleport
   - Power
   - MainAudio
+  - PacSound
   layers:
   - Default
   - TransparentFX

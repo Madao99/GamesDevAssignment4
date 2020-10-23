@@ -33,13 +33,15 @@ public class UIManager : MonoBehaviour
     public GameObject life3;
     private bool started;
     private bool startLoaded;
+    private bool sceneLoaded;
     private int lollyCount = 220;
 
 
 
     void Start()
     {
-
+        sceneLoaded = false;
+        started = false;
         //DontDestroyOnLoad(gameObject);
         if (ghostTimerTxt != null)
         {
@@ -57,11 +59,20 @@ public class UIManager : MonoBehaviour
     
     void Update()
     {
-        if(started == false)
+        if (started == false && GameObject.FindGameObjectWithTag("Player") != null) 
         {
-            started = true;
             StartCoroutine(LevelCountdown());
+            started = true;
         }
+
+        if (sceneLoaded == true)
+        {
+            GameObject.FindGameObjectWithTag("QuitBtn").GetComponent<Button>().onClick.AddListener(LoadStartScene);
+            gameOverTxt.text = "";
+            lifeNumber = 3;
+            sceneLoaded = false;
+        }
+        
 
         
         if(gameTimeTxt != null)
@@ -98,7 +109,7 @@ public class UIManager : MonoBehaviour
         if (GameObject.Find("MapLoader") != null)
         {
             //lollyCount = GameObject.Find("MapLoader").GetComponent<LevelGenerator>().GetLollies();
-            Debug.Log(lollyCount);
+            //Debug.Log(lollyCount);
         }
         if (gameOverTxt != null)
         {
@@ -158,69 +169,53 @@ public class UIManager : MonoBehaviour
     }
     public void LoadLevelOne()
     {
+        //started = false;
         SceneManager.LoadSceneAsync(1);
         SceneManager.sceneLoaded += OnSceneLoaded;
+        
 
     }
 
     public void LoadStartScene()
     {
-        SceneManager.LoadScene(0);
+        SceneManager.LoadSceneAsync(0, LoadSceneMode.Single);
+        started = true;
     }
 
     public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if(scene.buildIndex == 1)
         {
-            //StartCoroutine(LevelCountdown());
-            GameObject.FindGameObjectWithTag("QuitBtn").GetComponent<Button>().onClick.AddListener(LoadStartScene);
-            /*if (life1 == null)
-            {
-                life1 = Instantiate(lives[0], GameObject.Find("HUD").transform);
-            }
-            if (life2 == null)
-            {
-                life2 = Instantiate(lives[1], GameObject.Find("HUD").transform);
-            }
-            if (life3 == null)
-            {
-                life3 = Instantiate(lives[2], GameObject.Find("HUD").transform);
-            }*/
-            if (life3 != null)
-            {
-                life3.GetComponent<Image>().enabled = true;
-            }
-            if (life2 != null)
-            {
-                life2.GetComponent<Image>().enabled = true;
-            }
-            if (life1 != null)
-            {
-                life1.GetComponent<Image>().enabled = true;
-            }
-            gameOverTxt.text = "";
-            lifeNumber = 3;
+            
+            
+            
             startLoaded = false;
+            started = false;
+            
         }
     }
 
     IEnumerator LevelCountdown()
     {
+        Debug.Log(started);
         countdownTxt.enabled = true;
         countdown = 3;
         Time.timeScale = 0;
         while (countdown > 0)
         {
+            Debug.Log(countdown);
             countdownTxt.text = countdown.ToString();
             yield return new WaitForSecondsRealtime(1f);
             countdown--;
         }
+        
         if (countdown == 0)
         {
             countdownTxt.text = "GO!!";
             yield return new WaitForSecondsRealtime(1f);
             Time.timeScale = 1;
             countdownTxt.enabled = false;
+            sceneLoaded = true;
         }
     }
 
